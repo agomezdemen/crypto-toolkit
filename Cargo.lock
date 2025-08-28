@@ -127,12 +127,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 
 [[package]]
-name = "az"
-version = "1.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b7e4c2464d97fe331d41de9d5db0def0a96f4d823b8b32a2efd503578988973"
-
-[[package]]
 name = "base16ct"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -402,8 +396,6 @@ dependencies = [
 name = "crypto-toolkit"
 version = "0.1.0"
 dependencies = [
- "aead",
- "aes",
  "aes-gcm",
  "anyhow",
  "base64",
@@ -421,9 +413,6 @@ dependencies = [
  "proptest",
  "rand_chacha",
  "rand_core 0.9.3",
- "rug",
- "serde",
- "serde_json",
  "sha2",
  "thiserror",
  "x25519-dalek",
@@ -633,16 +622,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gmp-mpfr-sys"
-version = "1.6.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a636fb6a653382a379ee1e5593dacdc628667994167024c143214cafd40c1a86"
-dependencies = [
- "libc",
- "windows-sys",
-]
-
-[[package]]
 name = "group"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -743,12 +722,6 @@ name = "libc"
 version = "0.2.175"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a82ae493e598baaea5209805c49bbf2ea7de956d50d7da0da1164f9c6d28543"
-
-[[package]]
-name = "libm"
-version = "0.2.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9fbbcab51052fe104eb5e5d351cf728d30a5be1fe14d9be8a3b097481fb97de"
 
 [[package]]
 name = "linux-raw-sys"
@@ -1043,18 +1016,6 @@ checksum = "f8dd2a808d456c4a54e300a23e9f5a67e122c3024119acbfd73e3bf664491cb2"
 dependencies = [
  "hmac",
  "subtle",
-]
-
-[[package]]
-name = "rug"
-version = "1.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58ad2e973fe3c3214251a840a621812a4f40468da814b1a3d6947d433c2af11f"
-dependencies = [
- "az",
- "gmp-mpfr-sys",
- "libc",
- "libm",
 ]
 
 [[package]]
