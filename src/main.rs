@@ -4,11 +4,11 @@
 use clap::Parser;
 
 #[derive(Parser, Debug)]
-#[command(name = "crypt", version, about = "Educational cryptography toolkit built with Rust")]
-struct Args {
+#[command(
+    name = "crypt",
+    version,
+    about = "Educational cryptography toolkit built with Rust"
+)]
+struct Args {}
 
-}
-
-fn main() {
-    
-}
+fn main() {}
