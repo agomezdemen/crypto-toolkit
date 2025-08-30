@@ -222,20 +222,38 @@ mod tests {
         #[test]
         fn gcd_zero_cases() {
             assert_eq!(gcd(&BigUint::ZERO, &BigUint::ZERO), BigUint::ZERO);
-            assert_eq!(gcd(&BigUint::ZERO, &BigUint::from(58u32)), BigUint::from(58u32));
-            assert_eq!(gcd(&BigUint::from(23u32), &BigUint::ZERO), BigUint::from(23u32));
+            assert_eq!(
+                gcd(&BigUint::ZERO, &BigUint::from(58u32)),
+                BigUint::from(58u32)
+            );
+            assert_eq!(
+                gcd(&BigUint::from(23u32), &BigUint::ZERO),
+                BigUint::from(23u32)
+            );
         }
 
         #[test]
         fn gcd_basic_examples() {
-            // both even 
-            assert_eq!(gcd(&BigUint::from(48u32), &BigUint::from(18u32)), BigUint::from(6u32));
-            // both prime 
-            assert_eq!(gcd(&BigUint::from(17u32), &BigUint::from(13u32)), BigUint::from(1u32));
+            // both even
+            assert_eq!(
+                gcd(&BigUint::from(48u32), &BigUint::from(18u32)),
+                BigUint::from(6u32)
+            );
+            // both prime
+            assert_eq!(
+                gcd(&BigUint::from(17u32), &BigUint::from(13u32)),
+                BigUint::from(1u32)
+            );
             // equal numbers
-            assert_eq!(gcd(&BigUint::from(16u32), &BigUint::from(16u32)), BigUint::from(16u32));
+            assert_eq!(
+                gcd(&BigUint::from(16u32), &BigUint::from(16u32)),
+                BigUint::from(16u32)
+            );
             // one odd, one even
-            assert_eq!(gcd(&BigUint::from(21u32), &BigUint::from(14u32)), BigUint::from(7u32));
+            assert_eq!(
+                gcd(&BigUint::from(21u32), &BigUint::from(14u32)),
+                BigUint::from(7u32)
+            );
         }
 
         #[test]
