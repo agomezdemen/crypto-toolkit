@@ -71,7 +71,7 @@ pub fn modexp(
         b = (&b * &b) % modulus;
     }
 
-    return Ok(result);
+    Ok(result);
 }
 
 // Performs the process of finding the greatest common divisor (GCD)
