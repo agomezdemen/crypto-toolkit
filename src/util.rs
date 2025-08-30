@@ -28,8 +28,12 @@ impl std::error::Error for ModExpError {}
 // Performs modular exponentiation using right-to-left binary method
 // this method of modular exponentiation reduces time complexity from O(exponent) (naive)
 // to O(log(exponent)) which is necessary when working with large numbers required by RSA
-pub fn modexp(base: &BigUint, exponent: &BigUint, modulus: &BigUint) -> Result<BigUint, ModExpError> {
-    // modulus = 0 is an invalid case 
+pub fn modexp(
+    base: &BigUint,
+    exponent: &BigUint,
+    modulus: &BigUint,
+) -> Result<BigUint, ModExpError> {
+    // modulus = 0 is an invalid case
     if modulus.is_zero() {
         return Err(ModExpError::InvalidModulus);
     }
@@ -47,7 +51,7 @@ pub fn modexp(base: &BigUint, exponent: &BigUint, modulus: &BigUint) -> Result<B
     let mut result = BigUint::one();
     let mut expo_prime = exponent.clone();
 
-    // the base is reduced here to make computations easier because 
+    // the base is reduced here to make computations easier because
     // congruent results repeat when the base is bigger than the modulus
     let mut b = base % modulus;
 
@@ -62,7 +66,7 @@ pub fn modexp(base: &BigUint, exponent: &BigUint, modulus: &BigUint) -> Result<B
         // halves the problem size each step which is what gives us O(log(exponent))
         expo_prime >>= 1;
 
-        // the base at this step represents a^(2^t) for the next bit 
+        // the base at this step represents a^(2^t) for the next bit
         // allowing us to simply square the base
         b = (&b * &b) % modulus;
     }
@@ -78,8 +82,6 @@ pub fn egcd() {}
 
 // Performs modular inverse process
 pub fn modinv() {}
-
-
 
 #[cfg(test)]
 mod tests {
@@ -136,8 +138,8 @@ mod tests {
 
     #[test]
     fn modexp_modpow_match_with_randoms() {
-        use rand_chacha::{ ChaCha20Rng, rand_core::SeedableRng };
         use num_bigint::RandBigInt;
+        use rand_chacha::{ChaCha20Rng, rand_core::SeedableRng};
 
         let mut rng = ChaCha20Rng::from_seed([42u8; 32]);
 
@@ -146,8 +148,10 @@ mod tests {
             let b = rng.gen_biguint(256);
             let e = rng.gen_biguint(256);
             let mut m = rng.gen_biguint(256);
-            // ensure modulus is greater than 1 
-            if m <= BigUint::one() { m = BigUint::from(2u32); }
+            // ensure modulus is greater than 1
+            if m <= BigUint::one() {
+                m = BigUint::from(2u32);
+            }
 
             let my_result = modexp(&b, &e, &m).expect("valid modulus");
             let reference = b.modpow(&e, &m);
