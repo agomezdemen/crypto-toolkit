@@ -40,7 +40,7 @@ pub fn modexp(
 
     // covering modulus = 1 edge case
     if *modulus == BigUint::one() {
-        return Ok(BigUint::zero());
+        return Ok(BigUint::ZERO);
     }
 
     // covering exponent = 0 edge case
@@ -74,8 +74,62 @@ pub fn modexp(
     Ok(result)
 }
 
-// Performs the process of finding the greatest common divisor (GCD)
-pub fn gcd() {}
+// Implements binary GCD algorithm (Steins algorithm)
+// for maximum performance to find greatest common divisor
+pub fn gcd(a: &BigUint, b: &BigUint) -> BigUint {
+    let mut u = a.clone();
+    let mut v = b.clone();
+    
+    // checking edge case where if either is zero then the GCD is the non-zero variable
+    if u.is_zero() {
+        return v;
+    }
+    if v.is_zero() {
+        return u;
+    }
+    
+    let mut k: usize = 0;
+
+    // this loop counts the common power of two in variable u and v
+    // this loop also removes common factors of two because that will not affect the GCD
+    // and will help reduce the computations needed
+    while u.is_even() && v.is_even() {
+        u >>= 1;
+        v >>= 1;
+        k += 1;
+    }
+
+    // making variable u into an odd number to
+    // remove remaining factors of two from variable u
+    while u.is_even() {
+        u >>= 1;
+    }
+
+    // this loop is where the main reduction happens
+    while !v.is_zero() {
+
+        // making variable v into an odd number to
+        // remove remaining factors of two from variable v
+        while v.is_even() {
+            v >>= 1;
+        }
+        
+        // if statement to swap variable so that the subtraction is always positive
+        if u > v {
+            std::mem::swap(&mut u, &mut v)
+        }
+        
+        // here we take advantage of the fact 
+        // that gcd(u, v) = gcd(u, v - u) when v >= u
+        v = &v - &u;
+    }
+
+    // here the common power which was factored
+    // from the first while loop is restored
+    // after all the reductions and the restored common
+    // factor u is the GCD for the odd reduced pair
+    u << k
+}
 
 // Performs the extended greatest common divisor process
 pub fn egcd() {}
@@ -158,4 +212,6 @@ mod tests {
             assert_eq!(my_result, reference);
         }
     }
+
+
 }
