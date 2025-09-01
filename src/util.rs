@@ -130,12 +130,60 @@ pub fn gcd(a: &BigUint, b: &BigUint) -> BigUint {
     u << k
 }
 
-// Performs the extended greatest common divisor process
-pub fn egcd() {}
+// Performs the iterative extended euclidean algorithm
+// returns (gcd, x, y) which satisfy a*x + b*y = gcd
+pub fn egcd(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
+    let mut old_r = a.clone();
+    let mut r = b.clone();
 
-// Performs modular inverse process
-pub fn modinv() {}
+    let mut old_s = BigInt::one();
+    let mut s = BigInt::ZERO;
 
+    let mut old_t = BigInt::ZERO;
+    let mut t = BigInt::one();
+
+    while !r.is_zero() {
+        // old_r = q*r + remainder
+        let (q, remainder) = old_r.div_rem(&r);
+        old_r = r;
+        r = remainder;
+
+        let temp_s = old_s - &q * &s;
+        old_s = s;
+        s = temp_s;
+
+        let temp_t = old_t - &q * &t;
+        old_t = t;
+        t = temp_t;
+    }
+
+    (old_r, old_s, old_t)
+}
+
+// Performs modular inverse
+pub fn modinv(a: &BigInt, m: &BigInt) -> Option<BigInt> {
+    // egcd takes care of the most important calculations
+    // needed to determine if there is an inverse
+    let (gcd, mut x, _y) = egcd(a, m);
+
+    if gcd == -(BigInt::one()){
+        x = -(x);
+    }
+    // if the gcd is not one then there is no inverse
+    else if gcd != BigInt::one() {
+        return None;
+    }
+
+
+    // normalizing keeps results betewen [0, m)
+    // otherwise we would get negative ansers
+    let normalized_result = ((x % m) + m) % m;
+    Some(normalized_result)
+}
+
+
+
+// ---------------------tests--------------------------
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -283,6 +331,106 @@ mod tests {
                 let result = gcd(&a, &b);
                 let reference = a.gcd(&b);
                 assert_eq!(result, reference);
+            }
+        }
+    }
+
+    mod egcd_tests {
+        use super::*;
+
+        #[test]
+        fn egcd_zero_cases() {
+            let (gcd, _x, _y) = egcd(&BigInt::ZERO, &BigInt::ZERO);
+            assert_eq!(gcd, BigInt::ZERO);
+
+            let (gcd, _x, _y) = egcd(&BigInt::from(42), &BigInt::ZERO);
+            assert_eq!(gcd, BigInt::from(42));
+
+            let (gcd, _x, _y) = egcd(&BigInt::ZERO, &BigInt::from(85));
+            assert_eq!(gcd, BigInt::from(85));
+        }
+
+        #[test]
+        fn egcd_identity() {
+            // a=240, b=46 -> gcd=2, and 240*x + 46*y = 2
+            let a = BigInt::from(240);
+            let b = BigInt::from(46);
+            let (gcd, x, y) = egcd(&a, &b);
+
+            // comparing to library gcd
+            assert_eq!(gcd, a.gcd(&b));
+            // check if bezout identity holds
+            assert_eq!(gcd, a.clone() * x + b.clone() * y);
+        }
+
+        #[test]
+        fn egcd_coprime() {
+            let a = BigInt::from(17);
+            let b = BigInt::from(13);
+            let (gcd, x, y) = egcd(&a, &b);
+            assert!(gcd.is_one());
+            assert_eq!(gcd, a * x + b * y);
+        }
+    }
+
+    mod modinv_tests {
+        use super::*;
+
+        #[test]
+        fn modinv_basic_examples() {
+            // 3^{-1} mod 11 = 4
+            let inv = super::modinv(&BigInt::from(3), &BigInt::from(11)).unwrap();
+            assert_eq!(inv, BigInt::from(4));
+
+            // 10^{-1} mod 17 = 12
+            let inv = super::modinv(&BigInt::from(10), &BigInt::from(17)).unwrap();
+            assert_eq!(inv, BigInt::from(12));
+
+            // 7^{-1} mod 26 = 15
+            let inv = super::modinv(&BigInt::from(7), &BigInt::from(26)).unwrap();
+            assert_eq!(inv, BigInt::from(15));
+        }
+
+        #[test]
+        fn modinv_no_inverse_cases() {
+            assert!(super::modinv(&BigInt::from(6), &BigInt::from(9)).is_none());
+            assert!(super::modinv(&BigInt::from(12), &BigInt::from(18)).is_none());
+        }
+
+        #[test]
+        fn modinv_handles_negative_a() {
+            // (-3) mod 11 has inverse 7 (since -3 ≡ 8, and 8*7 ≡ 1 mod 11)
+            let inv = super::modinv(&BigInt::from(-3), &BigInt::from(11)).unwrap();
+            assert_eq!(inv, BigInt::from(7));
+        }
+
+        #[test]
+        fn modinv_random_coprimes() {
+            use num_bigint::RandBigInt;
+            use num_traits::Signed;
+            use rand_chacha::{ChaCha20Rng, rand_core::SeedableRng};
+
+            // Small randomized check: pick random m, choose a coprime a,
+            // verify (a * inv) % m == 1 with non-negative normalization.
+            let mut rng = ChaCha20Rng::from_seed([42u8; 32]);
+
+            for _ in 0..8 {
+                // modulus in [2, 2^16)
+                let m = rng.gen_bigint(16).abs() + BigInt::from(2);
+                // choose a in [1, m-1]
+                let mut a = rng.gen_bigint_range(&BigInt::one(), &m);
+
+                // ensure coprime
+                while a.gcd(&m) != BigInt::one() {
+                    a = rng.gen_bigint_range(&BigInt::one(), &m);
+                }
+
+                let inv = super::modinv(&a, &m).expect("should be invertible");
+
+                // Check (a * inv) % m == 1, normalized to [0, m)
+                let one = (a * inv) % &m;
+                let one = (one + &m) % &m;
+                assert_eq!(one, BigInt::one());
             }
         }
     }
