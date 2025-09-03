@@ -29,7 +29,7 @@ impl std::error::Error for ModExpError {}
 // this method of modular exponentiation reduces time complexity from O(exponent) (naive)
 // to O(log(exponent)) which is necessary when working with large numbers required by RSA
 pub fn modexp(
-    base: &BigUint,
+base: &BigUint,
     exponent: &BigUint,
     modulus: &BigUint,
 ) -> Result<BigUint, ModExpError> {
@@ -166,7 +166,7 @@ pub fn modinv(a: &BigInt, m: &BigInt) -> Option<BigInt> {
     // needed to determine if there is an inverse
     let (gcd, mut x, _y) = egcd(a, m);
 
-    if gcd == -(BigInt::one()){
+    if gcd == -(BigInt::one()) {
         x = -(x);
     }
     // if the gcd is not one then there is no inverse
@@ -174,14 +174,11 @@ pub fn modinv(a: &BigInt, m: &BigInt) -> Option<BigInt> {
         return None;
     }
 
-
     // normalizing keeps results betewen [0, m)
     // otherwise we would get negative ansers
     let normalized_result = ((x % m) + m) % m;
     Some(normalized_result)
 }
-
-
 
 // ---------------------tests--------------------------
 #[cfg(test)]
